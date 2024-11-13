@@ -1,0 +1,135 @@
+\documentclass[uplatex]{jsarticle}
+%数式
+\usepackage{amsmath,amssymb,bm}
+%箇条書き
+\usepackage{enumerate}
+%画像
+\usepackage[dvipdfmx]{graphicx}
+
+\pagestyle{empty}%ページ番号が欲しい場合は不要
+
+%−−−−−−−−−−−−−−以下変更不可−−−−−−−−−−−−−−−−−
+
+\makeatletter
+
+\def\department#1{\def\@department{#1}}
+\def\id#1{\def\@id{#1}}
+
+\def\@maketitle{
+\begin{center}
+  {\LARGE \@title \par}%タイトル
+  \vskip 1em
+  {\large \@date}%日付
+  \vskip 0.5em
+  {\large \@department}%科類
+  \vskip 0.5em
+  {\large \@id}%学籍番号
+  \hspace{0.5em}
+  {\large \@author}%著者
+\end{center}
+}
+
+\makeatother
+
+%−−−−−−−−−−−−−−以下変更可−−−−−−−−−−−−−−−−
+
+
+%タイトルの表示設定
+
+\title{ウィーナー・フィルタの導出}%タイトル
+\date{\today}%日付 「\today」のままなら今日の日付が出力されます。
+\department{工学部計数工学科　システム情報工学コース}%学部学科
+\id{03-240641}%学籍番号
+\author{山田哲士}%名前
+
+
+%ここから文書
+\begin{document}
+\maketitle
+
+未知の原信号 \( X(\omega) \) にフィルタ \( H(\omega) \) が掛かり、さらにノイズ \( N(\omega) \) が加わった劣化信号 \( Y(\omega) \) が得られたとする。
+\begin{equation}
+Y(\omega) = H(\omega) X(\omega) + N(\omega) \tag{1}
+\end{equation}
+
+ノイズが定常で信号と無相関な場合、劣化信号にウィーナー・フィルタ \( G(\omega) \) を掛けると、復元誤差（誤差パワー・スペクトルの期待値）を最小にできる。
+\begin{equation}
+E\left[ \left| X(\omega) - G(\omega) Y(\omega) \right|^2 \right] \to \min \tag{2}
+\end{equation}
+
+煩雑なので、以下では \( X(\omega) \) などの \( (\omega) \) を省略する。式 (2) を
+\begin{equation}
+l = E\left[ | X - G Y |^2 \right] \tag{3}
+\end{equation}
+と表すことにして、式 (1) を代入して展開していく。
+\begin{align*}
+l &= E\left[ | X - G Y |^2 \right] \\
+&= E\left[ | X - G(H X + N) |^2 \right] \\
+&= E\left[ | (1 - G H) X - G N |^2 \right]
+\end{align*}
+
+一般に \( |z|^2 = z z^* \) だから、
+\begin{align*}
+l &= E\left[ \left\{ (1 - G H) X - G N \right\} \left\{ (1 - G H)^* X^* - G^* N^* \right\} \right] \\
+&= (1 - G H)(1 - G H)^* E[X X^*] - G (1 - G H)^* E[N X^*] - G^* (1 - G H) E[X N^*] + |G|^2 E[N N^*]
+\end{align*}
+
+ここで、\( G \) と \( H \) は確定値なので期待値演算 \( E[\ ] \) の外に出せる。また、原信号 \( X \) とノイズ \( N \) が無相関であるとすると、\( E[N X^*] = E[N^* X] = 0 \) となる。
+
+原信号 \( X \) のパワー・スペクトルを
+\begin{equation}
+P_S = E[ |X|^2 ] = E[ X X^* ] \tag{9}
+\end{equation}
+ノイズ \( N \) のパワー・スペクトルを
+\begin{equation}
+P_N = E[ |N|^2 ] = E[ N N^* ] \tag{10}
+\end{equation}
+とする。以上を踏まえて、式を整理すると：
+\begin{equation}
+l = (1 - G H)(1 - G H)^* P_S + |G|^2 P_N \tag{12}
+\end{equation}
+
+展開すると、
+\begin{align*}
+l &= P_S - (G H + G^* H^*) P_S + |G|^2 |H|^2 P_S + |G|^2 P_N \\
+&= P_S - 2 \Re \left[ G H \right] P_S + |G|^2 \left( |H|^2 P_S + P_N \right)
+\end{align*}
+ここで、\( \Re \left[ G H \right] \) は \( G H \) の実部を表す。
+
+誤差 \( l \) を \( |G| \) の二次式として整理すると、
+\begin{equation}
+l = a |G|^2 + b G + b^* G^* + c \tag{17}
+\end{equation}
+ただし、
+\begin{align*}
+a &= |H|^2 P_S + P_N \\
+b &= - H P_S \\
+c &= P_S
+\end{align*}
+
+一般に、\( a > 0 \) のとき、二次形式 \( a |G|^2 + b G + b^* G^* + c \) は次のように変形できる。
+\begin{equation}
+a |G|^2 + b G + b^* G^* + c = a \left| G + \frac{b^*}{a} \right|^2 + c - \frac{|b|^2}{a} \tag{22}
+\end{equation}
+
+したがって、誤差 \( l \) は次のように表される。
+\begin{equation}
+l = \left( |H|^2 P_S + P_N \right) \left| G - \frac{H^* P_S}{|H|^2 P_S + P_N} \right|^2 + \frac{P_S P_N}{|H|^2 P_S + P_N} \tag{29}
+\end{equation}
+
+このとき、誤差 \( \varepsilon \) が最小になるのは次式を満たすときである。
+\begin{equation}
+G = \frac{H^* P_S}{|H|^2 P_S + P_N} \tag{30}
+\end{equation}
+
+従って、
+\begin{equation}
+  \varepsilon = \frac{P_N}{P_S} \tag{31}
+\end{equation}
+
+とすれば良いこととなる。\\
+
+参考文献 \\
+https://www.allisone.co.jp/html/Notes/DSP/Filter/Wiener-filter/index.html
+
+\end{document}
