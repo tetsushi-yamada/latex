@@ -1,0 +1,111 @@
+\documentclass[uplatex]{jsarticle}
+%数式
+\usepackage{amsmath,amssymb,bm}
+%箇条書き
+\usepackage{enumerate}
+%画像
+\usepackage[dvipdfmx]{graphicx}
+
+\pagestyle{empty}%ページ番号が欲しい場合は不要}
+
+%−−−−−−−−−−−−−−以下変更不可−−−−−−−−−−−−−−−−−
+
+\makeatletter
+
+\def\department#1{\def\@department{#1}}
+\def\id#1{\def\@id{#1}}
+
+\def\@maketitle{
+\begin{center}
+  {\LARGE \@title \par}%タイトル
+  \vskip 1em
+  {\large \@date}%日付
+  \vskip 0.5em
+  {\large \@department}%科類
+  \vskip 0.5em
+  {\large \@id}%学籍番号
+  \hspace{0.5em}
+  {\large \@author}%著者
+\end{center}
+}
+
+\makeatother
+
+%−−−−−−−−−−−−−−以下変更可−−−−−−−−−−−−−−−−
+
+
+%タイトルの表示設定
+
+%{}内を書き換えてください。
+\title{CTの原理とフーリエスライス定理による説明}%タイトル
+\date{\today}%日付 「\today」のままなら今日の日付が出力されます。
+\department{工学部計数工学科　システム情報工学コース}%学部学科
+\id{03-240641}%学籍番号
+\author{山田哲士}%名前
+
+
+%ここから文書
+\begin{document}
+\maketitle
+
+\section*{1. 投影データの取得}
+
+まず、被写体の断面を表す2次元関数を $f(x, y)$ とする。CTスキャンでは、様々な角度 $\theta$ からX線を照射し、その投影データ（ラドン変換）を取得する。投影データ $p_\theta(s)$ は、線 $L$ 上での $f(x, y)$ の積分で表される。
+
+\[
+p_\theta(s) = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(x, y) \delta(s - x\cos\theta - y\sin\theta) \, dx \, dy
+\]
+
+ここで、$\delta$ はディラックのデルタ関数であり、積分は線 $L: x\cos\theta + y\sin\theta = s$ 上で行われる。
+
+\section*{2. フーリエスライス定理の定式化}
+
+フーリエスライス定理は、投影データの1次元フーリエ変換が、被写体の2次元フーリエ変換の特定の断面に等しいことを示している。
+
+投影データ $p_\theta(s)$ のフーリエ変換 $P_\theta(\omega)$ は次のように定義される。
+
+\[
+P_\theta(\omega) = \int_{-\infty}^{\infty} p_\theta(s) e^{-j2\pi \omega s} \, ds
+\]
+
+被写体 $f(x, y)$ の2次元フーリエ変換 $F(u, v)$ は以下の通りである。
+
+\[
+F(u, v) = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(x, y) e^{-j2\pi (ux + vy)} \, dx \, dy
+\]
+
+フーリエスライス定理は、次の関係を示す。
+
+\[
+P_\theta(\omega) = F(u, v) \quad \text{ただし} \quad u = \omega \cos\theta, \quad v = \omega \sin\theta
+\]
+
+つまり、投影データのフーリエ変換 $P_\theta(\omega)$ は、被写体の2次元フーリエ空間における角度 $\theta$ の直線（スライス）上の値に等しい。
+
+\section*{3. フーリエスライス定理の証明}
+
+\begin{align*}
+P_\theta(\omega) &= \int_{-\infty}^{\infty} p_\theta(s) e^{-j2\pi \omega s} \, ds \\
+&= \int_{-\infty}^{\infty} \left( \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(x, y) \delta(s - x\cos\theta - y\sin\theta) \, dx \, dy \right) e^{-j2\pi \omega s} \, ds \\
+&= \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(x, y) \left( \int_{-\infty}^{\infty} \delta(s - x\cos\theta - y\sin\theta) e^{-j2\pi \omega s} \, ds \right) dx \, dy \\
+&= \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(x, y) e^{-j2\pi \omega (x\cos\theta + y\sin\theta)} \, dx \, dy \\
+&= F(\omega \cos\theta, \omega \sin\theta)
+\end{align*}
+
+最後の等式は、2次元フーリエ変換 $F(u, v)$ において $u = \omega \cos\theta$, $v = \omega \sin\theta$ と置いた結果である。
+
+\section*{4. CT画像の再構成}
+
+CT画像を再構成する手順は以下の通りである。
+
+\begin{enumerate}
+    \item \textbf{投影データの取得}：様々な角度 $\theta$ での投影データ $p_\theta(s)$ を収集する。
+    \item \textbf{フーリエ変換の実施}：各投影データ $p_\theta(s)$ に対して1次元フーリエ変換 $P_\theta(\omega)$ を計算します。
+    \item \textbf{周波数空間の構築}：フーリエスライス定理に基づき、得られた $P_\theta(\omega)$ を2次元周波数空間 $F(u, v)$ の対応する直線上に配置する。
+    \item \textbf{逆フーリエ変換}：周波数空間 $F(u, v)$ に対して2次元逆フーリエ変換を行い、被写体の断面像 $f(x, y)$ を再構成する。
+\end{enumerate}
+
+\section*{5. 参考文献}
+\verb|http://racco.mikeneko.jp/Kougi/2011a/IPPR/2011aippr12.pdf|
+
+\end{document}
